@@ -8,20 +8,20 @@ const db = new sqlite3.Database('./inventory', (err) => {
 });
 
 const products = [
-    { id: 1, name: "Processzor", grouppi: 'számtech' },
-    { id: 2, name: "Ledlámpa", grouppi: 'háztartás' },
-    { id: 3, name: "Szappan", grouppi: 'virusellen' },
-    { id: 4, name: "Kutya", grouppi: 'kiskedvenc' },
+    { id: 1, name: "Processzor", grouppi: 'számitástechnika' },
+    { id: 2, name: "Sütő", grouppi: 'konyhatechnika' },
+    { id: 3, name: "Kazán", grouppi: 'fűtestechnika' },
+    { id: 4, name: "Függöny", grouppi: 'árnyékolástechnika' },
 ]
 
 db.serialize(function () {
-    db.run("CREATE TABLE IF NOT EXISTS products ('name' VARCHAR(100), 'grouppi' VARCHAR(100))");
+    db.run("CREATE TABLE IF NOT EXISTS products ('id' VARCHAR(100),'name' VARCHAR(100), 'grouppi' VARCHAR(100))");
 })
 
 db.serialize(function(){
     products.forEach( e => {
         console.log(e)
-        db.prepare('INSERT INTO products VALUES (?, ?)')
-        .run(e.name, e.grouppi)
+        db.prepare('INSERT INTO products VALUES (?, ?, ?)')
+        .run(e.id, e.name, e.grouppi)
     })
 })

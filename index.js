@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const port = 3000
+const port = 4000
 const sqlite3 = require('sqlite3').verbose();
 
 const db = new sqlite3.Database('./inventory', (err) => {
@@ -11,28 +11,51 @@ const db = new sqlite3.Database('./inventory', (err) => {
 });
 
 const exphbs = require('express-handlebars');
-app.engine('handlebars', exphbs());
+app.engine('handlebars', exphbs({
+    defaultLayout: 'main', 
+    layoutsDir: __dirname + '/views/layouts/',
+    partialsDir: __dirname + '/views/partials/'
+}
+    
+));
 app.set('view engine', 'handlebars');
 app.use(express.static('public'));
 app.use(express.static('views/images'));
 
 
-app.get('/', (req, res) => {
+app.get('/products', (req, res) => {
 
-    let resultArray = []
-    db.serialize(function(){
+   db.serialize(function(){
         
         db.all("SELECT * FROM products", function(err, results) {
             if (err != null) {
                 // hibakezelés
             }
             console.log(results)
-            resultArray = results
+            res.render('products', {array: results})
+        })
+    })
+})
+
+app.post('/products', (req, res)=>{
+
+})
+
+app.get('/stocks', (req, res) => {
+
+   db.serialize(function(){
+        
+        db.all("SELECT * FROM products", function(err, results) {
+            if (err != null) {
+                // hibakezelés
+            }
+            console.log(results)
+            res.render('stocks', {array: results})
         })
     })
 
     
-    res.render('home', { array: resultArray })
+    
 })
 
 

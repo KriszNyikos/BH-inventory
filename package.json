@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,13 @@
   "bugs": {
     "url": "https://github.com/KriszNyikos/BH-inventory/issues"
   },
-  "homepage": "https://github.com/KriszNyikos/BH-inventory#readme"
+  "homepage": "https://github.com/KriszNyikos/BH-inventory#readme",
+  "dependencies": {
+    "bootstrap": "^4.4.1",
+    "express": "^4.17.1",
+    "express-handlebars": "^3.1.0",
+    "jquery": "^3.4.1",
+    "popper.js": "^1.16.1",
+    "sqlite3": "^4.1.1"
+  }
 }

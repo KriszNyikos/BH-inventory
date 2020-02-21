@@ -1,0 +1,29 @@
+<div class="col-10 border border-dark p-4">
+            <table class="table table-bordered text-center">
+                <thead class="thead-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Megnevezés</th>
+                        <th>Csoport</th>
+                        <th>Műveletek</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each array}}
+                    <tr>
+                        <td>{{this.id}}</td>
+                        <td>{{this.name}}</td>
+                        <td>{{this.grouppi}}</td>
+                        <td class="text-center">
+                            <button class="btn btn-outline-dark ">Szerkesztés</button>
+                            <button class="btn btn-danger">Törlés</button>
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+            <div class=" d-flex align-items-end flex-column" style="height: 150px;">
+                <div class="mt-auto"><button type="button" data-toggle="modal" data-target="#exampleModal" class="btn btn-primary">Új termék</button></div>
+            </div>
+        </div>
+{{> newProduct}}

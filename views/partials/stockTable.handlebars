@@ -15,7 +15,7 @@
                         <td>{{this.name}}</td>
                         <td>{{this.quantity}}</td>
                         <td class="text-center">
-                            <button class="btn btn-outline-dark" data-toggle="modal" data-target="#{{this.id}}Modal">Szerkesztés</button>
+                            <button class="btn btn-outline-dark" data-toggle="modal" data-target="#modal{{this.id}}">Szerkesztés</button>
                         </td>
                     </tr>
                     {{/each}}
@@ -24,26 +24,19 @@
         </div>
 
 {{#each array}}
-<div class="modal fade" id="{{this.id}}Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
+<div class="modal fade" id="modal{{this.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" ria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Új termék felvitele</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
             <div class="modal-body">
-                <form action='/products' method="POST">
+                <form action='/stocks/{{this.id}}' method="POST">
                     <div class="form-group">
                         <label for="recipient-name" class="col-form-label">Mennyiség megadása:</label>
-                        <input type="number" class="form-control" name="name" id="recipient-name">
+                        <input type="number" class="form-control" value='{{this.quantity}}' name="quantity" id="recipient-name">
                     </div>
                 
                     <div class="d-flex justify-content-between">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Mégsem</button>
-                        <button type="submit" class="btn btn-primary">Új felvitele</button>
+                        <button type="submit" class="btn btn-primary">Új mennyiség</button>
                     </div>
                 </form>
             </div>

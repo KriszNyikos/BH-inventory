@@ -3,8 +3,7 @@
                 <thead class="thead-light">
                     <tr>
                         <th>ID</th>
-                        <th>Megnevezés</th>
-                        <th>Csoport</th>
+                        <th>Csoport neve</th>
                         <th>Műveletek</th>
                     </tr>
                 </thead>
@@ -13,7 +12,6 @@
                     <tr>
                         <td>{{this.id}}</td>
                         <td>{{this.name}}</td>
-                        <td>{{this.catName}}</td>
                         <td class="text-center">
                             <button class="btn btn-outline-dark" data-toggle="modal" data-target="#modal{{this.id}}">Szerkesztés</button>
                             <button class="btn btn-danger" onclick="deleting({{this.id}})">Törlés</button>
@@ -23,16 +21,16 @@
                 </tbody>
             </table>
             <div class=" d-flex align-items-end flex-column" style="height: 150px;">
-                <div class="mt-auto"><button type="button" data-toggle="modal" data-target="#exampleModal" class="btn btn-primary">Új termék</button></div>
+                <div class="mt-auto"><button type="button" data-toggle="modal" data-target="#exampleModal" class="btn btn-primary">Új kategória</button></div>
             </div>
         </div>
-{{> newProduct}}
+{{> newCat}}
 
 <script>
 
     function deleting(id){
         console.log(id)
-       fetch('/products', {
+       fetch('/categories', {
            headers: {
                     'Content-Type': 'application/json'
                     },
@@ -55,27 +53,16 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">{{this.name}} Adatainak módosítása</h5>
+                <h5 class="modal-title" id="exampleModalLabel">{{this.name}} csoport adatainak módosítása</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form action='/products/{{this.id}}' method="POST">
+                <form action='/categories/{{this.id}}' method="POST">
                     <div class="form-group">
                         <label for="product-name" class="col-form-label">Megnevezés:</label>
-                        <input type="text" class="form-control" name="name"  value='{{this.name}}' id="product-name">
-                    </div>
-                    <div class="form-group row">
-                        <label for="list" class="col-3">Csoport</label>
-                        <select id="list" name="catlist" class="dropdown col-8">
-                            <option value="none">Válassz egyet</option>
-                            {{#each ../cat}}
-                                <option value="{{this.id}}">{{this.name}}</option>
-                            {{/each}}
-                        </select>
-                        <label for="desc" class="col-3 mt-4">Leírás</label>
-                        <textarea name="description" id="desc" class=" col-8 mt-4" cols="20" rows="5">{{this.desc}}</textarea>
+                        <input type="text" class="form-control" name="name" value='{{this.name}}' id="product-name">
                     </div>
                     <div class="d-flex justify-content-between">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Mégsem</button>

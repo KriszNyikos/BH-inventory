@@ -8,10 +8,10 @@ const db = new sqlite3.Database('./inventory', (err) => {
 });
 
 const products = [
-    { id: 1, name: "Processzor", cat_id: 1, desc: 'itt a sok habi' },
-    { id: 2, name: "Sütő", cat_id: 2, desc: 'habihabi' },
-    { id: 3, name: "Kazán", cat_id: 3, desc: 'ideis' },
-    { id: 4, name: "Függöny", cat_id: 4, desc: 'nanemááááááá' },
+    { id: 1, name: "Processzor", desc: 'itt a sok habi' },
+    { id: 2, name: "Sütő", desc: 'habihabi' },
+    { id: 3, name: "Kazán", desc: 'ideis' },
+    { id: 4, name: "Függöny", desc: 'nanemááááááá' },
 ]
 
 const inventory = [
@@ -32,7 +32,8 @@ const pro_cat = [
     {pro: 1, cat : 1},
     {pro: 2, cat : 2},
     {pro: 3, cat : 3},
-    {pro: 4, cat : 4}
+    {pro: 4, cat : 4},
+    {pro: 1, cat : 4}
 
 ]
 
@@ -40,6 +41,7 @@ db.serialize(function () {
     db.run("DROP TABLE products");
     db.run("DROP TABLE inventory");
     db.run("DROP TABLE categories");
+    db.run("DROP TABLE pro_cat");
 })
 
 db.serialize(function () {
@@ -91,7 +93,7 @@ db.serialize(function(){
 
 db.serialize(function () {
 
-    db.all("SELECT p.id, p.name AS productname, i.quantity, p.desc, c.id AS cat_id, c.name AS cat_name FROM categories c INNER JOIN products p ON p.cat_id = c.id INNER JOIN inventory i ON i.product_id = p.id;", function (err, result) {
+    db.all("SELECT DISTINCT p.id, p.name, p.desc, i.quantity, c.name AS category FROM products p INNER JOIN inventory i ON i.product_id = p.id INNER JOIN pro_cat pc ON pc.product_id = i.product_id INNER JOIN categories c ON c.id = pc.cat_id", function (err, result) {
         if (err != null) {
             // hibakezelés
         }
@@ -99,16 +101,3 @@ db.serialize(function () {
     
     })
 })
-/*
-db.serialize(function () {
-
-    db.all("SELECT p.id, p.name AS productname, i.quantity, p.desc, c.id AS cat_id, c.name AS cat_name FROM products p INNER JOIN inventory i ON i.product_id = p.id INNER JOIN pro_cat ON pro_cat product_id =;", function (err, result) {
-        if (err != null) {
-            // hibakezelés
-        }
-        console.log(result)
-    
-    })
-})
-
-*/

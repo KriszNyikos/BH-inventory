@@ -16,7 +16,7 @@
                     </div>
                     <div class="form-group row">
                         <label for="list" class="col-3">Csoport</label>
-                        <select id="list" name="catlist" class="dropdown col-8">
+                        <select id="list" name="catlist" class="dropdown col-8" multiple>
                             <option value="none">Válassz egyet</option>
                             {{#each cat}}
                                 <option value="{{this.id}}">{{this.name}}</option>

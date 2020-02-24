@@ -1,57 +1,71 @@
+
+
 <div class="col-10 border border-dark p-4">
-            <table class="table table-bordered text-center">
-                <thead class="thead-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Megnevezés</th>
-                        <th>Csoport</th>
-                        <th>Műveletek</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{#each array}}
-                    <tr>
-                        <td>{{this.id}}</td>
-                        <td>{{this.name}}</td>
-                        <td>{{this.catName}}</td>
-                        <td class="text-center">
-                            <button class="btn btn-outline-dark" data-toggle="modal" data-target="#modal{{this.id}}">Szerkesztés</button>
-                            <button class="btn btn-danger" onclick="deleting({{this.id}})">Törlés</button>
-                        </td>
-                    </tr>
-                    {{/each}}
-                </tbody>
-            </table>
-            <div class=" d-flex align-items-end flex-column" style="height: 150px;">
-                <div class="mt-auto"><button type="button" data-toggle="modal" data-target="#exampleModal" class="btn btn-primary">Új termék</button></div>
-            </div>
-        </div>
+    <table id="productTable" class="table table-bordered table-striped text-center">
+        <thead class="thead-light">
+            <tr>
+                <th>ID</th>
+                <th>Megnevezés</th>
+                <th>Csoport</th>
+                <th>Műveletek</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each array}}
+            <tr>
+                <td>{{this.id}}</td>
+                <td>{{this.name}}</td>
+                <td>{{this.category}}</td>
+                <td class="text-center">
+                    <button class="btn btn-outline-dark" data-toggle="modal"
+                        data-target="#modal{{this.id}}">Szerkesztés</button>
+                    <button class="btn btn-danger" onclick="deleting({{this.id}})">Törlés</button>
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    <div class=" d-flex align-items-end flex-column" style="height: 150px;">
+        <div class="mt-auto"><button type="button" data-toggle="modal" data-target="#exampleModal"
+                class="btn btn-primary">Új termék</button></div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+
+<script> $(document).ready(function () {
+        $('#productTable').DataTable();
+    });</script>
+
 {{> newProduct}}
 
 <script>
 
-    function deleting(id){
+    function deleting(id) {
         console.log(id)
-       fetch('/products', {
-           headers: {
-                    'Content-Type': 'application/json'
-                    },
+        fetch('/products', {
+            headers: {
+                'Content-Type': 'application/json'
+            },
             method: 'DELETE',
-            body: JSON.stringify({id: id})
+            body: JSON.stringify({ id: id })
         })
-        .then(res =>{
-            if(res.status == 200){
-                window.location.reload()
-            }
-        })
+            .then(res => {
+                if (res.status == 200) {
+                    window.location.reload()
+                }
+            })
     }
 
 </script>
-       
+
 
 {{#each array}}
- 
-<div class="modal fade" id="modal{{this.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+<div class="modal fade" id="modal{{this.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -64,18 +78,19 @@
                 <form action='/products/{{this.id}}' method="POST">
                     <div class="form-group">
                         <label for="product-name" class="col-form-label">Megnevezés:</label>
-                        <input type="text" class="form-control" name="name"  value='{{this.name}}' id="product-name">
+                        <input type="text" class="form-control" name="name" value='{{this.name}}' id="product-name">
                     </div>
                     <div class="form-group row">
                         <label for="list" class="col-3">Csoport</label>
-                        <select id="list" name="catlist" class="dropdown col-8">
+                        <select id="list" name="catlist" class="dropdown col-8" multiple>
                             <option value="none">Válassz egyet</option>
                             {{#each ../cat}}
-                                <option value="{{this.id}}">{{this.name}}</option>
+                            <option value="{{this.id}}">{{this.name}}</option>
                             {{/each}}
                         </select>
                         <label for="desc" class="col-3 mt-4">Leírás</label>
-                        <textarea name="description" id="desc" class=" col-8 mt-4" cols="20" rows="5">{{this.desc}}</textarea>
+                        <textarea name="description" id="desc" class=" col-8 mt-4" cols="20"
+                            rows="5">{{this.desc}}</textarea>
                     </div>
                     <div class="d-flex justify-content-between">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Mégsem</button>

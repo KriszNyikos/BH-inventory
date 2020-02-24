@@ -28,10 +28,12 @@ app.use(express.urlencoded({ extended: true }))
 app.get('/products', (req, res) => {
 
     db.serialize(function () {
-        db.all("SELECT c.name AS catName, p.id, p.name, p.desc FROM categories c INNER JOIN products p ON p.cat_id = c.id", function (err, results) {
+        db.all("SELECT DISTINCT p.id, p.name, p.desc, c.name AS category FROM products p INNER JOIN pro_cat pc ON pc.product_id = p.id INNER JOIN categories c ON c.id = pc.cat_id", function (err, results) {
             if (err != null) {
                 // hibakezelés
             }
+
+            console.log(results)
 
             db.all('SELECT * FROM categories', function (err, cat) {
 
@@ -55,6 +57,14 @@ app.delete('/products', (req, res) => {
     console.log(req.body)
     db.serialize(function () {
 
+        db.run(`DELETE FROM pro_cat WHERE product_id = ${parseInt(req.body.id)}`, (err) => {
+            if (err) {
+                return console.error(err.message);
+            }
+            console.log(`pro_cat table Row(s) deleted ${this.changes}`);
+
+        })
+
         db.run(`DELETE FROM inventory WHERE product_id = ${parseInt(req.body.id)}`, function (err) {
             if (err) {
                 return console.error(err.message);
@@ -69,6 +79,7 @@ app.delete('/products', (req, res) => {
             res.sendStatus(200)
         });
 
+
     })
 })
 
@@ -78,14 +89,40 @@ app.post('/products', (req, res) => {
     var last_id = 0
 
     db.serialize(function () {
+
         db.all('SELECT COUNT(id) FROM products', (err, result) => {
             last_id = result[0]['COUNT(id)'] + 1
 
-            db.prepare('INSERT INTO products VALUES (?, ?, ?, ?)')
-                .run(last_id, req.body.name, req.body.description, parseInt(req.body.catlist))
+            db.prepare('INSERT INTO products VALUES (?, ?, ?)')
+                .run(last_id, req.body.name, req.body.description)
+
+
+            db.all("SELECT * FROM products;", function (err, results) {
+                if (err != null) {
+                    // hibakezelés
+                }
+                console.log(results)
+
+            })
 
             db.prepare('INSERT INTO inventory VALUES (?, ?)')
                 .run(0, last_id)
+
+
+            db.all("SELECT * FROM inventory;", function (err, results) {
+                if (err != null) {
+                    // hibakezelés
+                }
+                console.log(results)
+
+            })
+
+            req.body.catlist.forEach(c => {
+                console.log(c)
+                db.prepare('INSERT INTO pro_cat VALUES (?, ?)')
+                    .run(last_id, c)
+            });
+
 
             res.redirect('/products')
         })
@@ -103,14 +140,37 @@ app.post('/products/:id', (req, res) => {
     }
 
     db.serialize(function () {
-        db.run(`UPDATE products SET name = '${req.body.name}', cat_id = '${parseInt(req.body.catlist)}', desc='${req.body.description}' WHERE id = ${parseInt(req.params.id)}`, function (err) {
+        db.run(`UPDATE products SET name = '${req.body.name}', desc='${req.body.description}' WHERE id = ${parseInt(req.params.id)}`, function (err) {
             if (err) {
                 return console.error(err.message);
             }
             console.log(`Row(s) updated: ${this.changes}`);
-            res.redirect('/products')
+
         });
 
+        db.run(`DELETE FROM pro_cat WHERE product_id = ${req.params.id}`, (err) => {
+            if (err) {
+                return console.error(err.message);
+            }
+            console.log(`pro_cat table Row(s) deleted ${this.changes}`);
+        })
+
+    
+
+      if (typeof req.body.catlist === "string") {
+            db.prepare('INSERT INTO pro_cat VALUES (?, ?)')
+                .run(req.params.id, req.body.catlist)
+        } else {
+            req.body.catlist.forEach(c => {
+                console.log(c)
+                db.prepare('INSERT INTO pro_cat VALUES (?, ?)')
+                    .run(req.params.id, c)
+            });
+        }
+
+
+
+        res.redirect('/products')
     })
 
 })
@@ -206,43 +266,24 @@ app.post('/categories/:id', (req, res) => {
 })
 
 app.delete('/categories', (req, res) => {
-    console.log(req.body)
+    console.log(req.body.id)
     db.serialize(function () {
 
-        db.all(`SELECT p.id, c.id FROM products p INNER JOIN categories c ON c.id = p.cat_id WHERE c.id = ${req.body.id}`, function (err, results) {
-
-            if (err != null) {
-                // hibakezelés
+        db.run(`DELETE FROM pro_cat WHERE cat_id = ${req.body.id}`, (err) => {
+            if (err) {
+                return console.error(err.message);
             }
-            console.log(results[0])
-
-            delId = results[0].id
-
-           db.run(`DELETE FROM inventory WHERE product_id = ${parseInt(delId)}`, function (err) {
-                if (err) {
-                    return console.error(err.message);
-                }
-                console.log(`Row(s) deleted: ${this.changes}`);
-            });
-
-            db.run(`DELETE FROM products WHERE id = ${parseInt(delId)}`, function (err) {
-                if (err) {
-                    return console.error(err.message);
-                }
-                console.log(`Row(s) deleted: ${this.changes}`);
-            });
-
-            db.run(`DELETE FROM categories WHERE id = ${parseInt(req.body.id)}`, function (err) {
-                if (err) {
-                    return console.error(err.message);
-                }
-                console.log(`Row(s) deleted: ${this.changes}`);
-            });
-
-            res.redirect('/categories')
-
-        
+            console.log(`pro_cat table Row(s) deleted ${this.changes}`);
         })
+
+        db.run(`DELETE FROM categories WHERE id = ${req.body.id}`, (err) => {
+            if (err) {
+                return console.error(err.message);
+            }
+            console.log(` categories table Row(s) deleted ${this.changes}`);
+        })
+
+        res.sendStatus(200)
     })
 })
 

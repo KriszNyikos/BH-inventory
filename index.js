@@ -33,12 +33,12 @@ app.get('/products', (req, res) => {
                 // hibakezelés
             }
 
-            console.log(results)
+            //    console.log(results)
 
             db.all('SELECT * FROM categories', function (err, cat) {
 
-                console.log(results)
-                console.log(cat)
+                //         console.log(results)
+                //        console.log(cat)
 
                 if (err != null) {
                     // hibakezelés
@@ -54,7 +54,7 @@ app.get('/products', (req, res) => {
 })
 
 app.delete('/products', (req, res) => {
-    console.log(req.body)
+    //   console.log(req.body)
     db.serialize(function () {
 
         db.run(`DELETE FROM pro_cat WHERE product_id = ${parseInt(req.body.id)}`, (err) => {
@@ -86,6 +86,10 @@ app.delete('/products', (req, res) => {
 
 app.post('/products', (req, res) => {
     console.log(req.body)
+
+    if (req.body.catlist === undefined) {
+        return res.send('Nincs kategória megadva')
+    }
     var last_id = 0
 
     db.serialize(function () {
@@ -101,7 +105,7 @@ app.post('/products', (req, res) => {
                 if (err != null) {
                     // hibakezelés
                 }
-                console.log(results)
+                //          console.log(results)
 
             })
 
@@ -113,16 +117,20 @@ app.post('/products', (req, res) => {
                 if (err != null) {
                     // hibakezelés
                 }
-                console.log(results)
+                //         console.log(results)
 
             })
 
-            req.body.catlist.forEach(c => {
-                console.log(c)
+            if (typeof req.body.catlist === "string") {
                 db.prepare('INSERT INTO pro_cat VALUES (?, ?)')
-                    .run(last_id, c)
-            });
-
+                    .run(req.params.id, req.body.catlist)
+            } else {
+                req.body.catlist.forEach(c => {
+                    //               console.log(c)
+                    db.prepare('INSERT INTO pro_cat VALUES (?, ?)')
+                        .run(req.params.id, c)
+                });
+            }
 
             res.redirect('/products')
         })
@@ -132,10 +140,10 @@ app.post('/products', (req, res) => {
 })
 
 app.post('/products/:id', (req, res) => {
-    console.log(req.body)
-    console.log(req.params)
+    //  console.log(req.body)
+    //  console.log(req.params)
 
-    if (req.body.catlist == 'none') {
+    if (req.body.catlist === undefined) {
         res.send('Nincs kategória megadva')
     }
 
@@ -155,14 +163,14 @@ app.post('/products/:id', (req, res) => {
             console.log(`pro_cat table Row(s) deleted ${this.changes}`);
         })
 
-    
 
-      if (typeof req.body.catlist === "string") {
+
+        if (typeof req.body.catlist === "string") {
             db.prepare('INSERT INTO pro_cat VALUES (?, ?)')
                 .run(req.params.id, req.body.catlist)
         } else {
             req.body.catlist.forEach(c => {
-                console.log(c)
+                //               console.log(c)
                 db.prepare('INSERT INTO pro_cat VALUES (?, ?)')
                     .run(req.params.id, c)
             });
@@ -183,7 +191,7 @@ app.get('/stocks', (req, res) => {
             if (err != null) {
                 // hibakezelés
             }
-            console.log(results)
+            //          console.log(results)
 
         })
 
@@ -191,7 +199,7 @@ app.get('/stocks', (req, res) => {
             if (err != null) {
                 // hibakezelés
             }
-            console.log(results)
+            //         console.log(results)
             res.render('nav', {
                 array: results,
                 stocks: true
@@ -220,7 +228,7 @@ app.get('/categories', (req, res) => {
 
         db.all('SELECT * FROM categories', function (err, results) {
 
-            console.log(results)
+            //         console.log(results)
 
             if (err != null) {
                 // hibakezelés
@@ -236,7 +244,7 @@ app.get('/categories', (req, res) => {
 
 
 app.post('/categories', (req, res) => {
-    console.log(req.body)
+    //   console.log(req.body)
     var last_id = 0
 
     db.serialize(function () {
@@ -266,7 +274,7 @@ app.post('/categories/:id', (req, res) => {
 })
 
 app.delete('/categories', (req, res) => {
-    console.log(req.body.id)
+    //  console.log(req.body.id)
     db.serialize(function () {
 
         db.run(`DELETE FROM pro_cat WHERE cat_id = ${req.body.id}`, (err) => {

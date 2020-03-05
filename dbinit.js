@@ -9,9 +9,9 @@ const db = new sqlite3.Database('./inventory', (err) => {
 
 const products = [
     { id: 1, name: "Processzor", desc: 'itt a sok habi' },
-    { id: 2, name: "Sütő", desc: 'habihabi' },
-    { id: 3, name: "Kazán", desc: 'ideis' },
-    { id: 4, name: "Függöny", desc: 'nanemááááááá' },
+    { id: 2, name: "Késkészlet", desc: 'habihabi' },
+    { id: 3, name: "Kisradiátor", desc: 'ideis' },
+    { id: 4, name: "Függöny", desc: 'nanemááááááá' }
 ]
 
 const inventory = [
@@ -22,18 +22,20 @@ const inventory = [
 ]
 
 const categories = [
-    { id: 1, catname: 'Számítástechnika' },
-    { id: 2, catname: 'Konyhatechnika' },
-    { id: 3, catname: 'Fűtéstechnika'},
-    { id: 4, catname: 'Árnyékolástechnika'},
+    { id: 1, catname: 'SzámítástechnikaF', parent_id: null },
+    { id: 2, catname: 'KonyhatechnikaF' , parent_id: null },
+    { id: 3, catname: 'FűtéstechnikaF' , parent_id: null},
+    { id: 4, catname: 'ÁrnyékolástechnikaF' , parent_id: null },
+    { id: 5, catname: 'Hardver' , parent_id: 1 },
+    { id: 6, catname: 'Vágóeszközök' , parent_id: 2 },
+    { id: 7, catname: 'Radiátorok' , parent_id: 3 },
 ]
 
 const pro_cat = [
-    {pro: 1, cat : 1},
-    {pro: 2, cat : 2},
-    {pro: 3, cat : 3},
-    {pro: 4, cat : 4},
-    {pro: 1, cat : 4}
+    {pro: 1, cat : 5},
+    {pro: 2, cat : 6},
+    {pro: 3, cat : 7},
+    {pro: 4, cat : 4}
 
 ]
 
@@ -45,7 +47,7 @@ db.serialize(function () {
 })
 
 db.serialize(function () {
-    db.run("CREATE TABLE IF NOT EXISTS categories ('name' TEXT, 'id' INTEGER PRIMARY KEY NOT NULL);");
+    db.run("CREATE TABLE IF NOT EXISTS categories ('name' TEXT, parent_id INTEGER NULL, 'id' INTEGER PRIMARY KEY NOT NULL);");
 })
 
 db.serialize(function () {
@@ -71,8 +73,8 @@ db.serialize(function(){
 
 db.serialize(function(){
     categories.forEach( e => {
-        db.prepare(`INSERT INTO categories VALUES (?,?)`)
-        .run(e.catname, e.id)
+        db.prepare(`INSERT INTO categories VALUES (?,?,?)`)
+        .run(e.catname, e.parent_id, e.id)  
     })
 })
 

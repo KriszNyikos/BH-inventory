@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const port = 3000
 const sqlite3 = require('sqlite3').verbose();
+//const product = require('controller/product.js')
 
 
 const db = new sqlite3.Database('./inventory', (err) => {
@@ -27,18 +28,45 @@ app.use(express.urlencoded({ extended: true }))
 
 app.get('/products', (req, res) => {
 
+   // product.productList()
+
+
     db.serialize(function () {
-        db.all("SELECT DISTINCT p.id, p.name, p.desc, c.name AS category FROM products p INNER JOIN pro_cat pc ON pc.product_id = p.id INNER JOIN categories c ON c.id = pc.cat_id", function (err, results) {
+        db.all("SELECT DISTINCT p.id, p.name, p.desc, c.name AS category, c.parent_id FROM products p INNER JOIN pro_cat pc ON pc.product_id = p.id INNER JOIN categories c ON c.id = pc.cat_id", function (err, results) {
             if (err != null) {
                 // hibakezelés
             }
 
-            //    console.log(results)
+            // console.log(results)
 
             db.all('SELECT * FROM categories', function (err, cat) {
 
+
+                let categories = []
                 //         console.log(results)
-                //        console.log(cat)
+                //console.log(cat)
+
+                cat.forEach(c => {
+                    if (c.parent_id === null) {
+                        // console.log(c)
+                        categories.push({ name: c.name, subs: [], id: c.id })
+                    }
+                })
+
+                cat.forEach(c => {
+                    if (c.parent_id) {
+                        //console.log(c)
+
+                        categories.forEach(cat => {
+                            if (cat.id === c.parent_id) {
+                                cat.subs.push({ name: c.name, id: c.id })
+                            }
+                        })
+
+                    }
+                })
+
+                console.log(categories)
 
                 if (err != null) {
                     // hibakezelés
@@ -54,7 +82,7 @@ app.get('/products', (req, res) => {
 })
 
 app.delete('/products', (req, res) => {
-    //   console.log(req.body)
+    //console.log(req.body)
     db.serialize(function () {
 
         db.run(`DELETE FROM pro_cat WHERE product_id = ${parseInt(req.body.id)}`, (err) => {
@@ -83,14 +111,13 @@ app.delete('/products', (req, res) => {
     })
 })
 
-
 app.post('/products', (req, res) => {
     console.log(req.body)
 
     if (req.body.catlist === undefined) {
-        return res.send('Nincs kategória megadva')
+        res.send('Nincs kategória megadva')
     }
-    var last_id = 0
+    let last_id = 0
 
     db.serialize(function () {
 
@@ -105,7 +132,15 @@ app.post('/products', (req, res) => {
                 if (err != null) {
                     // hibakezelés
                 }
-                //          console.log(results)
+                //  console.log(results)
+
+            })
+
+            db.all("SELECT * FROM pro_cat;", function (err, results) {
+                if (err != null) {
+                    // hibakezelés
+                }
+                console.log(results)
 
             })
 
@@ -123,12 +158,12 @@ app.post('/products', (req, res) => {
 
             if (typeof req.body.catlist === "string") {
                 db.prepare('INSERT INTO pro_cat VALUES (?, ?)')
-                    .run(req.params.id, req.body.catlist)
+                    .run(last_id, req.body.catlist)
             } else {
                 req.body.catlist.forEach(c => {
-                    //               console.log(c)
+                    console.log(c)
                     db.prepare('INSERT INTO pro_cat VALUES (?, ?)')
-                        .run(req.params.id, c)
+                        .run(last_id, c)
                 });
             }
 
@@ -244,15 +279,16 @@ app.get('/categories', (req, res) => {
 
 
 app.post('/categories', (req, res) => {
-    //   console.log(req.body)
+     console.log(req.body)
     var last_id = 0
 
     db.serialize(function () {
-        db.all('SELECT COUNT(id) FROM products', (err, result) => {
+        db.all('SELECT COUNT(id) FROM categories', (err, result) => {
             last_id = result[0]['COUNT(id)'] + 1
-
-            db.prepare('INSERT INTO categories VALUES (?, ?)')
-                .run(req.body.name, last_id)
+            let parentid = 1
+        
+            db.prepare('INSERT INTO categories VALUES (?, ?, ?)')
+               .run(req.body.name, parentid, last_id)
 
             res.redirect('/categories')
         })

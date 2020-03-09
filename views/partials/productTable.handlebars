@@ -1,12 +1,28 @@
 
 
 <div class="col-10 border border-dark p-4">
+    {{orders}}
+    <div class="container">
+        <div class="row justify-content-end">
+            <form action="/products" method="GET" class="col-9">
+                <label for="list col-2 mr-5">Termékcsoport: </label>
+                <select id="categories_list" name="categories_list_id" class="col-6 align-self-end ml-4 mr-4">
+                    <option value="">Összes csoport</option>
+                    {{#each ./cat}}
+                    <option value="{{this.id}}">{{this.name}}</option>
+                    {{/each}}
+                </select>
+                <button type="submit" class="col-2">Listázás</button>
+            </form>
+        </div>
+    </div>
+
     <table id="productTable" class="table table-bordered table-striped text-center">
         <thead class="thead-light">
             <tr>
-                <th>ID</th>
-                <th>Megnevezés</th>
-                <th>Csoport</th>
+                <th><a href="http://localhost:3000/products?orderby=id&order=DESC">id <img src="sort-up-and-down-arrows-couple.png"> {{#if orders.id}} {{orders.id}}{{/if}}</a> </th>
+                <th><a href="http://localhost:3000/products?orderby=name&order=DESC">Megnevezés {{#if orders.name}} {{orders.name}} {{/if}}</a></th>
+                <th><a href="http://localhost:3000/products?orderby=category&order=DESC">Csoport {{#if orders.category}} {{orders.category}}{{/if}}</a></th>
                 <th>Műveletek</th>
             </tr>
         </thead>
@@ -19,7 +35,8 @@
                 <td class="text-center">
                     <button class="btn btn-outline-dark" data-toggle="modal"
                         data-target="#modal{{this.id}}">Szerkesztés</button>
-                    <button class="btn btn-danger" onclick="deleting({{this.id}})">Törlés</button>
+                    <button class="btn btn-danger" data-toggle="modal"
+                        data-target="#delModal{{this.id}}">Törlés</button>
                 </td>
             </tr>
             {{/each}}
@@ -30,14 +47,6 @@
                 class="btn btn-primary">Új termék</button></div>
     </div>
 </div>
-
-<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
-
-<script> $(document).ready(function () {
-        $('#productTable').DataTable();
-    });</script>
 
 {{> newProduct}}
 
@@ -63,7 +72,6 @@
 
 
 {{#each array}}
-
 <div class="modal fade" id="modal{{this.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
     aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -102,3 +110,5 @@
     </div>
 </div>
 {{/each}}
+
+{{> deleteConfirm}}

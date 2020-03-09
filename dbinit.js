@@ -1,5 +1,7 @@
 const sqlite3 = require('sqlite3').verbose();
 
+const bigDB = require('./seed_products') 
+
 const db = new sqlite3.Database('./inventory', (err) => {
     if (err) {
         return console.error(err.message);
@@ -7,6 +9,8 @@ const db = new sqlite3.Database('./inventory', (err) => {
     console.log('Database connection is succesfull')
 });
 
+
+/*   Old database
 const products = [
     { id: 1, name: "Processzor", desc: 'itt a sok habi' },
     { id: 2, name: "Késkészlet", desc: 'habihabi' },
@@ -15,29 +19,31 @@ const products = [
 ]
 
 const inventory = [
-    {product_id: 1, quantity: 30},
-    {product_id: 2, quantity: 71},
-    {product_id: 3, quantity: 863},
-    {product_id: 4, quantity: 73}
+    { product_id: 1, quantity: 30 },
+    { product_id: 2, quantity: 71 },
+    { product_id: 3, quantity: 863 },
+    { product_id: 4, quantity: 73 }
 ]
 
 const categories = [
     { id: 1, catname: 'SzámítástechnikaF', parent_id: null },
-    { id: 2, catname: 'KonyhatechnikaF' , parent_id: null },
-    { id: 3, catname: 'FűtéstechnikaF' , parent_id: null},
-    { id: 4, catname: 'ÁrnyékolástechnikaF' , parent_id: null },
-    { id: 5, catname: 'Hardver' , parent_id: 1 },
-    { id: 6, catname: 'Vágóeszközök' , parent_id: 2 },
-    { id: 7, catname: 'Radiátorok' , parent_id: 3 },
+    { id: 2, catname: 'KonyhatechnikaF', parent_id: null },
+    { id: 3, catname: 'FűtéstechnikaF', parent_id: null },
+    { id: 4, catname: 'ÁrnyékolástechnikaF', parent_id: null },
+    { id: 5, catname: 'Hardver', parent_id: 1 },
+    { id: 6, catname: 'Vágóeszközök', parent_id: 2 },
+    { id: 7, catname: 'Radiátorok', parent_id: 3 },
 ]
 
 const pro_cat = [
-    {pro: 1, cat : 5},
-    {pro: 2, cat : 6},
-    {pro: 3, cat : 7},
-    {pro: 4, cat : 4}
+    { pro: 1, cat: 5 },
+    { pro: 2, cat: 6 },
+    { pro: 3, cat: 7 },
+    { pro: 4, cat: 4 }
 
-]
+]*/
+
+const {products, inventory, categories, pro_cat} = bigDB
 
 db.serialize(function () {
     db.run("DROP TABLE products");
@@ -64,32 +70,32 @@ db.serialize(function () {
 
 
 
-db.serialize(function(){
-    pro_cat.forEach( e => {
+db.serialize(function () {
+    pro_cat.forEach(e => {
         db.prepare(`INSERT INTO pro_cat VALUES (?,?)`)
-        .run(e.pro, e.cat)
+            .run(e.pro, e.cat)
     })
 })
 
-db.serialize(function(){
-    categories.forEach( e => {
+db.serialize(function () {
+    categories.forEach(e => {
         db.prepare(`INSERT INTO categories VALUES (?,?,?)`)
-        .run(e.catname, e.parent_id, e.id)  
+            .run(e.catname, e.parent_id, e.id)
     })
 })
 
 
-db.serialize(function(){
-    products.forEach( e => {
+db.serialize(function () {
+    products.forEach(e => {
         db.prepare(`INSERT INTO products VALUES (?,?,?)`)
-        .run(e.id, e.name, e.desc )
+            .run(e.id, e.name, e.desc)
     })
 })
 
-db.serialize(function(){
-    inventory.forEach( e => {
+db.serialize(function () {
+    inventory.forEach(e => {
         db.prepare('INSERT INTO inventory VALUES (?,?)')
-        .run(e.quantity, e.product_id)
+            .run(e.quantity, e.product_id)
     })
 })
 
@@ -100,6 +106,6 @@ db.serialize(function () {
             // hibakezelés
         }
         console.log(result)
-    
+
     })
 })

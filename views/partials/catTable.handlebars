@@ -14,7 +14,7 @@
                         <td>{{this.name}}</td>
                         <td class="text-center">
                             <button class="btn btn-outline-dark" data-toggle="modal" data-target="#modal{{this.id}}">Szerkesztés</button>
-                            <button class="btn btn-danger" onclick="deleting({{this.id}})">Törlés</button>
+                            <button class="btn btn-danger" data-toggle="modal" data-target="#delModal{{this.id}}">Törlés</button>
                         </td>
                     </tr>
                     {{/each}}
@@ -74,3 +74,5 @@
     </div>
 </div>
 {{/each}}
+
+{{> deleteConfirm}}

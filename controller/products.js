@@ -2,6 +2,11 @@ const express = require('express')
 const products = express.Router()
 const sqlite3 = require('sqlite3').verbose();
 
+products.use(express.static('../public'));
+products.use(express.static('../views'));
+
+products.use(express.json())
+products.use(express.urlencoded({ extended: true }))
 
 const db = new sqlite3.Database('/home/krisztiandev/Braining hub/BH-inventory/inventory', (err) => {
     if (err) {
@@ -10,63 +15,114 @@ const db = new sqlite3.Database('/home/krisztiandev/Braining hub/BH-inventory/in
     console.log('Products: Database connection is succesfull')
 });
 
-products.get('/products',  (req, res)=> {
+let selectedCategoryId = 0
+let orders = { id: null, name: null, category: null }
 
-   db.serialize(function () {
-         db.all(`SELECT DISTINCT p.id, p.name, p.desc, c.name AS category, c.parent_id 
+
+products.get('/products', (req, res) => {
+
+
+
+    console.log(req.query)
+
+
+    db.serialize(function () {
+
+        selectedCategoryId = 0
+        orders = { id: null, name: null, category: null } // Amennyiben külső oldalról lépünk be a termékeke listába, minden érték visszaáll
+        let orderString = ''
+
+        if (req.query.orderby) {
+            orders[req.query.orderby] = req.query.order
+        }
+
+        if (orders.id || orders.name || orders.category) {
+
+            orderString = `ORDER BY`
+
+            if (orders.id) {
+                orderString = orderString.concat(` p.id ${orders.id}`)
+            }
+
+            if (orders.name) {
+                orderString = orderString.concat(` p.name ${orders.name}`)
+            }
+
+            if (orders.category) {
+                orderString = orderString.concat(` c.name ${orders.category}`)
+            }
+        }
+
+
+        console.log(orderString)
+
+
+        db.all(`SELECT DISTINCT p.id, p.name, p.desc, c.name AS category, c.id AS category_id, c.parent_id
                 FROM products p 
                 INNER JOIN pro_cat pc ON pc.product_id = p.id 
-                INNER JOIN categories c ON c.id = pc.cat_id`, function (err, results) {
-             if (err != null) {
-                 // hibakezelés
-             }
- 
-             // console.log(results)
- 
-             db.all('SELECT * FROM categories', function (err, cat) {
- 
- 
-                 let categories = []
-                 //         console.log(results)
-                 //console.log(cat)
- 
-                 cat.forEach(c => {
-                     if (c.parent_id === null) {
-                         // console.log(c)
-                         categories.push({ name: c.name, subs: [], id: c.id })
-                     }
-                 })
- 
-                 cat.forEach(c => {
-                     if (c.parent_id) {
-                         //console.log(c)
- 
-                         categories.forEach(cat => {
-                             if (cat.id === c.parent_id) {
-                                 cat.subs.push({ name: c.name, id: c.id })
-                             }
-                         })
- 
-                     }
-                 })
- 
-                 console.log(categories)
- 
-                 if (err != null) {
-                     // hibakezelés
-                 }
-                 res.render('nav', {
-                     cat: cat,
-                     array: results,
-                     products: true
-                 })
-             })
-         })
-     })
- })
+                INNER JOIN categories c ON c.id = pc.cat_id ${orderString}`, function (err, results) {
+            if (err != null) {
+                // hibakezelés
+            }
+
+            if (req.query.categories_list_id) { // Ha kiválasztottuk, milyen kategóriájú termékeket szeretnénk látni
+                selectedCategoryId = req.query.categories_list_id
+            }
+
+            if (selectedCategoryId != 0) {
+                results = results.filter(row => row.category_id == selectedCategoryId)
+            }
 
 
- products.delete('/products', (req, res) => {
+
+            //  console.log(results)
+
+            db.all('SELECT * FROM categories', function (err, cat) {
+                if (err != null) {
+                    // hibakezelés
+                }
+
+                let categories = []
+                //         console.log(results)
+                //console.log(cat)
+
+                cat.forEach(c => {
+                    if (c.parent_id === null) {
+                        // console.log(c)
+                        categories.push({ name: c.name, subs: [], id: c.id })
+                    }
+                })
+
+                cat.forEach(c => {
+                    if (c.parent_id) {
+                        //console.log(c)
+
+                        categories.forEach(cat => {
+                            if (cat.id === c.parent_id) {
+                                cat.subs.push({ name: c.name, id: c.id })
+                            }
+                        })
+
+                    }
+                })
+
+                // console.log(categories)
+
+                res.render('nav', {
+                    cat: cat,
+                    array: results,
+                    products: true,
+                    orders: orders
+                })
+            })
+        })
+    })
+})
+
+products.get('/products')
+
+
+products.delete('/products', (req, res) => {
     //console.log(req.body)
     db.serialize(function () {
 

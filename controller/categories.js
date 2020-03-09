@@ -3,6 +3,9 @@ const express = require('express')
 const categories = express.Router()
 const sqlite3 = require('sqlite3').verbose();
 
+categories.use(express.json())
+categories.use(express.urlencoded({ extended: true }))
+
 const db = new sqlite3.Database('/home/krisztiandev/Braining hub/BH-inventory/inventory', (err) => {
     if (err) {
         return console.error(err.message);

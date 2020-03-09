@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const port = 3000
 const sqlite3 = require('sqlite3').verbose();
+
 const products = require('./controller/products.js')
 const stocks = require('./controller/stocks.js')
 const categories = require('./controller/categories.js')

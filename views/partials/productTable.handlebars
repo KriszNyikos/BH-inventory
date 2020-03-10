@@ -1,7 +1,4 @@
-
-
 <div class="col-10 border border-dark p-4">
-    {{orders}}
     <div class="container">
         <div class="row justify-content-end">
             <form action="/products" method="GET" class="col-9">
@@ -20,9 +17,26 @@
     <table id="productTable" class="table table-bordered table-striped text-center">
         <thead class="thead-light">
             <tr>
-                <th><a href="http://localhost:3000/products?orderby=id&order=DESC">id <img src="sort-up-and-down-arrows-couple.png"> {{#if orders.id}} {{orders.id}}{{/if}}</a> </th>
-                <th><a href="http://localhost:3000/products?orderby=name&order=DESC">Megnevezés {{#if orders.name}} {{orders.name}} {{/if}}</a></th>
-                <th><a href="http://localhost:3000/products?orderby=category&order=DESC">Csoport {{#if orders.category}} {{orders.category}}{{/if}}</a></th>
+                <th>{{#if orderBooleans.id.un}} <a href="http://localhost:3000/products?orderby=id&order=ASC">id</a>
+                    <img src="sort-up-and-down-arrows-couple.png"> {{/if}} {{#if orderBooleans.id.asc}} <a
+                        href="http://localhost:3000/products?orderby=id&order=DESC">id</a> <img src="sort-up.png">
+                    {{/if}} {{#if orderBooleans.id.desc}} <a
+                        href="http://localhost:3000/products?orderby=id&order=ASC">id</a> <img src="sort-down.png">
+                    {{/if}}</th>
+                <th>{{#if orderBooleans.name.un}} <a
+                        href="http://localhost:3000/products?orderby=name&order=ASC">Megnevezés</a> <img
+                        src="sort-up-and-down-arrows-couple.png"> {{/if}} {{#if orderBooleans.name.asc}} <a
+                        href="http://localhost:3000/products?orderby=name&order=DESC">Megnevezés</a> <img
+                        src="sort-up.png"> {{/if}} {{#if orderBooleans.name.desc}} <a
+                        href="http://localhost:3000/products?orderby=name&order=ASC">Megnevezés</a> <img
+                        src="sort-down.png"> {{/if}}</th>
+                <th>{{#if orderBooleans.cat.un}} <a
+                        href="http://localhost:3000/products?orderby=category&order=ASC">Csoport</a> <img
+                        src="sort-up-and-down-arrows-couple.png"> {{/if}} {{#if orderBooleans.cat.asc}} <a
+                        href="http://localhost:3000/products?orderby=category&order=DESC">Csoport</a> <img
+                        src="sort-up.png"> {{/if}} {{#if orderBooleans.cat.desc}} <a
+                        href="http://localhost:3000/products?orderby=category&order=ASC">Csoport</a> <img
+                        src="sort-down.png"> {{/if}}</th>
                 <th>Műveletek</th>
             </tr>
         </thead>
@@ -40,6 +54,13 @@
                 </td>
             </tr>
             {{/each}}
+            <tr>
+                <td colspan="4" class="container">
+                        <div class="d-flex justify-content-end">
+                            <div><a href="">előző</a> <a href="">következő</a></div>
+                        </div>
+                </td>
+            </tr>
         </tbody>
     </table>
     <div class=" d-flex align-items-end flex-column" style="height: 150px;">

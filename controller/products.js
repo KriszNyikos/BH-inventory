@@ -18,12 +18,17 @@ const db = new sqlite3.Database('/home/krisztiandev/Braining hub/BH-inventory/in
 let selectedCategoryId = 0
 let orders = { id: null, name: null, category: null }
 
-
 products.get('/products', (req, res) => {
 
+    let orderBooleans = {
+        id: { asc: false, desc: false, un: true }, //un = unordered
+        name: { asc: false, desc: false, un: true },
+        cat: { asc: false, desc: false, un: true },
+    }
 
 
-    console.log(req.query)
+    console.log(orders)
+
 
 
     db.serialize(function () {
@@ -35,6 +40,45 @@ products.get('/products', (req, res) => {
         if (req.query.orderby) {
             orders[req.query.orderby] = req.query.order
         }
+//-----------------------------------------------------------------------------------
+        if (orders.id) {
+            orderBooleans.id.un = false
+
+            if (orders.id === 'ASC') {
+                orderBooleans.id.asc = true
+                orderBooleans.id.desc = false
+            } else {
+                orderBooleans.id.asc = false
+                orderBooleans.id.desc = true
+            }
+        }
+
+        if (orders.name) {
+            orderBooleans.name.un = false
+
+            if (orders.name == 'ASC') {
+                orderBooleans.name.asc = true
+                orderBooleans.name.desc = false
+            } else {
+                orderBooleans.name.asc = false
+                orderBooleans.name.desc = true
+            }
+        }
+
+        if (orders.category) {
+            orderBooleans.cat.un = false
+
+            if (orders.category == 'ASC') {
+                orderBooleans.cat.asc = true
+                orderBooleans.cat.desc = false
+            } else {
+                orderBooleans.cat.asc = false
+                orderBooleans.cat.desc = true
+            }
+
+        }
+        console.log(orderBooleans)
+//-------------------------------------------------------------------
 
         if (orders.id || orders.name || orders.category) {
 
@@ -112,7 +156,7 @@ products.get('/products', (req, res) => {
                     cat: cat,
                     array: results,
                     products: true,
-                    orders: orders
+                    orderBooleans: orderBooleans
                 })
             })
         })

@@ -6,7 +6,7 @@ const sqlite3 = require('sqlite3').verbose();
 categories.use(express.json())
 categories.use(express.urlencoded({ extended: true }))
 
-const db = new sqlite3.Database('/home/krisztiandev/Braining hub/BH-inventory/inventory', (err) => {
+const db = new sqlite3.Database('./inventory.db', (err) => {
     if (err) {
         return console.error(err.message);
     }

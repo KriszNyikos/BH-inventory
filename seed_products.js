@@ -78,8 +78,8 @@ console.log(products)
 console.log(inventory)
 console.log(categories)
 console.log(pro_cat)
-
 */
+
 module.exports = {
     products : products,
     inventory : inventory,

@@ -2,15 +2,15 @@ const sqlite3 = require('sqlite3').verbose();
 
 const bigDB = require('./seed_products') 
 
-const db = new sqlite3.Database('./inventory', (err) => {
+const db = new sqlite3.Database('./inventory.db', (err) => {
     if (err) {
         return console.error(err.message);
     }
     console.log('Database connection is succesfull')
 });
 
-
-/*   Old database
+/*
+// Old database
 const products = [
     { id: 1, name: "Processzor", desc: 'itt a sok habi' },
     { id: 2, name: "Késkészlet", desc: 'habihabi' },
@@ -72,40 +72,67 @@ db.serialize(function () {
 
 db.serialize(function () {
     pro_cat.forEach(e => {
-        db.prepare(`INSERT INTO pro_cat VALUES (?,?)`)
-            .run(e.pro, e.cat)
+        db.run(`INSERT INTO pro_cat VALUES (?,?)`,[e.pro, e.cat])
     })
-})
 
-db.serialize(function () {
+
+
     categories.forEach(e => {
-        db.prepare(`INSERT INTO categories VALUES (?,?,?)`)
-            .run(e.catname, e.parent_id, e.id)
+        db.run(`INSERT INTO categories VALUES (?,?,?)`, [e.catname, e.parent_id, e.id])
     })
-})
 
 
-db.serialize(function () {
+
+
     products.forEach(e => {
-        db.prepare(`INSERT INTO products VALUES (?,?,?)`)
-            .run(e.id, e.name, e.desc)
+        db.run(`INSERT INTO products VALUES (?,?,?)`, [e.id, e.name, e.desc])
     })
-})
 
-db.serialize(function () {
+
+
     inventory.forEach(e => {
-        db.prepare('INSERT INTO inventory VALUES (?,?)')
-            .run(e.quantity, e.product_id)
+        db.run('INSERT INTO inventory VALUES (?,?)', [e.quantity, e.product_id])
     })
-})
 
-db.serialize(function () {
 
     db.all("SELECT DISTINCT p.id, p.name, p.desc, i.quantity, c.name AS category FROM products p INNER JOIN inventory i ON i.product_id = p.id INNER JOIN pro_cat pc ON pc.product_id = i.product_id INNER JOIN categories c ON c.id = pc.cat_id", function (err, result) {
         if (err != null) {
             // hibakezelés
         }
-        console.log(result)
+        console.log('PRODUCTS', result)
 
     })
+
+    db.all("SELECT * FROM categories", function (err, result) {
+        if (err != null) {
+            // hibakezelés
+        }
+        console.log('CATEGORIES', result)
+
+    })
+
+    db.all("SELECT * FROM pro_cat", function (err, result) {
+        if (err != null) {
+            // hibakezelés
+        }
+        console.log('PRO_CAT', result)
+
+    })
+
+    db.all("SELECT * FROM inventory", function (err, result) {
+        if (err != null) {
+            // hibakezelés
+        }
+        console.log('INVENTORY', result)
+
+    })
+
+    db.close((err) => {
+        if (err) {
+            return console.error(err.message);
+        }
+        console.log('Close the database connection.');
+    });
 })
+
+

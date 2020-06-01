@@ -2,7 +2,7 @@ const express = require('express')
 const stocks = express.Router()
 const sqlite3 = require('sqlite3').verbose();
 
-const db = new sqlite3.Database('/home/krisztiandev/Braining hub/BH-inventory/inventory', (err) => {
+const db = new sqlite3.Database('./inventory.db', (err) => {
     if (err) {
         return console.error(err.message);
     }
@@ -17,7 +17,7 @@ stocks.get('/stocks', (req, res) => {
             if (err != null) {
                 // hibakezelés
             }
-            //          console.log(results)
+                      console.log('Teszt', results)
 
         })
 
@@ -25,7 +25,7 @@ stocks.get('/stocks', (req, res) => {
             if (err != null) {
                 // hibakezelés
             }
-            //         console.log(results)
+                    console.log('Stock', results)
             res.render('nav', {
                 array: results,
                 stocks: true

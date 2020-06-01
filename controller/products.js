@@ -8,7 +8,7 @@ products.use(express.static('../views'));
 products.use(express.json())
 products.use(express.urlencoded({ extended: true }))
 
-const db = new sqlite3.Database('/home/krisztiandev/Braining hub/BH-inventory/inventory', (err) => {
+const db = new sqlite3.Database('./inventory.db', (err) => {
     if (err) {
         return console.error(err.message);
     }
